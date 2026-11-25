@@ -133,7 +133,7 @@ def make_junk(n, rng, digit_pool):
     return np.stack(out)
 
 
-def load_mnist(limit=12000):
+def load_mnist(limit=30000):
     try:
         (x, y), _ = keras.datasets.mnist.load_data()
     except Exception as e:  # no internet, etc.
