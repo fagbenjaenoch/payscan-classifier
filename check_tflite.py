@@ -11,12 +11,17 @@ from pathlib import Path
 import numpy as np
 from PIL import Image
 
-from digit_utils import CLASS_NAMES, IMG, make_interpreter
+from digit_utils import CLASS_NAMES, IMG, make_interpreter, prepare_image
 
 ap = argparse.ArgumentParser()
 ap.add_argument("model")
 ap.add_argument("files", nargs="*")
 ap.add_argument("--folder")
+ap.add_argument(
+    "--prepare",
+    action="store_true",
+    help="invert / crop / pad any picture of one digit to a 32x32 crop",
+)
 a = ap.parse_args()
 files = [Path(f) for f in a.files] + (
     sorted(Path(a.folder).glob("*.png")) if a.folder else []
@@ -28,8 +33,16 @@ i_in, i_out = (
     interp.get_input_details()[0]["index"],
     interp.get_output_details()[0]["index"],
 )
+
 for f in files:
-    img = Image.open(f).convert("L").resize((IMG, IMG), Image.Resampling.BOX)
+    img = Image.open(f).convert("L")
+    if a.prepare:
+        img = prepare_image(img)
+    elif img.size != (IMG, IMG):
+        print(
+            f"{f.name}: WARNING: not {IMG}x{IMG}, so it is being squashed. Use --prepare for such images."
+        )
+        img = img.resize((IMG, IMG), Image.Resampling.BOX)
     x = (np.asarray(img, dtype=np.float32) / 255.0)[None, ..., None]
     interp.set_tensor(i_in, x)
     interp.invoke()

@@ -43,3 +43,15 @@ def make_interpreter(model_path=None, model_content=None):
 
         Interpreter = tf.lite.Interpreter
     return Interpreter(model_path=model_path, model_content=model_content)
+
+
+def prepare_image(img: Image.Image) -> Image.Image:
+    """Any grayscale picture of ONE digit (any size or aspect ratio) -> a 32x32 white-on-black crop.
+    Inverts if the picture is mostly light (dark digit on paper), drops faint background, then crops to
+    the digit and scales it to fit 24x24 WITHOUT stretching, like the app's segmenter does."""
+    a = np.asarray(img.convert("L"), dtype=np.uint8)
+    if a.mean() > 127:
+        a = 255 - a
+    a = np.where(a < 0.35 * a.max(), 0, a).astype(np.uint8)
+    crop = normalize_crop(Image.fromarray(a))
+    return crop if crop is not None else Image.new("L", (IMG, IMG), 0)
