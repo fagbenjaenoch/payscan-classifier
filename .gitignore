@@ -1,5 +1,8 @@
 data/
 out/
+raw/
+data_report/
+data_review/
 fake_strips/
 digit_samples/
 __pycache__/
