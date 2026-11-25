@@ -34,7 +34,10 @@ for f in files:
     interp.set_tensor(i_in, x)
     interp.invoke()
     p = interp.get_tensor(i_out)[0]
-    top = p.argsort()[::-1][:2]
+    top = p.argsort()[::-1][:3]
     print(
-        f"{f.name}: {CLASS_NAMES[top[0]]} ({p[top[0]]:.2f})   runner-up {CLASS_NAMES[top[1]]} ({p[top[1]]:.2f})"
+        f"{f.name}:\n",
+        f"\tLooks most like: {CLASS_NAMES[top[0]]} ({p[top[0]]:.2f})\n",
+        f"\tRunner-up {CLASS_NAMES[top[1]]} ({p[top[1]]:.2f})\n",
+        f"\t3rd: {CLASS_NAMES[top[2]]} ({p[top[2]]:.2f})",
     )
