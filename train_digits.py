@@ -192,7 +192,7 @@ def build_train_model(core):
     )
     model = keras.Sequential([keras.Input((IMG, IMG, 1)), aug, core])
     model.compile(
-        # optimizer=keras.optimizers.Adam(1e-3),  # ignore
+        optimizer="adam",
         loss=keras.losses.SparseCategoricalCrossentropy(from_logits=True),
         metrics=["accuracy"],
     )
@@ -219,7 +219,6 @@ def fit(model, x, y, xv, yv, epochs, lr=None):
     )
 
 
-# ----------------------------------------------------------------------------- evaluation
 def fit_temperature(logits, y):
     """Find T that makes softmax(logits / T) honest about its confidence (lowest log-loss)."""
     best_t, best = 1.0, 1e9
