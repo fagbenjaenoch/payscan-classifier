@@ -133,7 +133,7 @@ def make_junk(n, rng, digit_pool):
     return np.stack(out)
 
 
-def load_mnist(limit=30000):
+def load_mnist(limit):
     try:
         (x, y), _ = keras.datasets.mnist.load_data()
     except Exception as e:  # no internet, etc.
@@ -303,6 +303,12 @@ def main():
         "--mnist", action="store_true", help="pre-train on MNIST first (needs internet)"
     )
     ap.add_argument(
+        "--mnist-limit",
+        type=int,
+        default=30000,
+        help="sets the limit of pre-training data to be used from MNIST",
+    )
+    ap.add_argument(
         "--quantize",
         action="store_true",
         help="shrink the .tflite (dynamic-range quantization)",
@@ -342,7 +348,7 @@ def main():
     print(f"model parameters: {core.count_params():,}")
 
     if a.mnist:
-        mx, my = load_mnist()
+        mx, my = load_mnist(a.mnist_limit)
         if mx is not None:
             print("Pre-training on MNIST...")
             fit(model, f(mx), my, f(xva[yva < 10]), yva[yva < 10], epochs=5)
